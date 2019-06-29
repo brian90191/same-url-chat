@@ -17,8 +17,6 @@
           </v-btn>
         </v-toolbar>
 
-        <!-- {{ messages }} -->
-
         <v-list two-line style="height: 450px; padding:0;" class="scroll-y">
 
           <template v-for="(msg, index) in messages">
@@ -34,7 +32,7 @@
                 <v-list-tile-sub-title v-html="msg.content"></v-list-tile-sub-title>
               </v-list-tile-content>
               <v-list-tile-action>
-                <v-list-tile-action-text>{{ msg.timeStamp }}</v-list-tile-action-text>
+                <v-list-tile-action-text>{{ getTime(msg.createTime) }}</v-list-tile-action-text>
                 <v-icon v-show="msg.author === user" color="grey lighten-1">edit</v-icon>
               </v-list-tile-action>
             </v-list-tile>
@@ -53,58 +51,22 @@
 <script>
 import msgInput from '../Components/MessageInput'
 
-// import { db } from '../../db'
+import firebase from 'firebase/app'
+import { db } from '../../firebase'
 
 export default {
   props: ['user'],
   components: {
     msgInput
   },
+  firestore () {
+    return {
+      messages: db.collection('messages').orderBy('createTime')
+    }
+  },
   data() {
     return {
-      // messages: {},
-      messages: [
-        {
-          author: 'Brian',
-          timeStamp: '15 min',
-          content: "<span class='text--primary'>Spike Lee</span> &mdash; I'll be in your neighborhood"
-        },
-        {
-          author: 'Brian',
-          timeStamp: '15 min',
-          content: "<span class='text--primary'>to Operations support</span> &mdash; Wish I could come."
-        },
-        {
-          author: 'Brian',
-          timeStamp: '15 min',
-          content: "<span class='text--primary'>Bella</span> &mdash; Do you have Paris recommendations"
-        },
-        {
-          author: '布萊恩',
-          timeStamp: '15 min',
-          content: "<span class='text--primary'>LaToya</span> &mdash; Do you want to hang out?"
-        },
-        {
-          author: 'Charlie',
-          timeStamp: '15 min',
-          content: "<span class='text--primary'>Nancy</span> &mdash; Do you see what time it is?"
-        },
-        {
-          author: 'peng',
-          timeStamp: '15 min',
-          content: "<span class='text--primary'>LaToya</span> &mdash; Do you want to hang out?"
-        },
-        {
-          author: 'YYY',
-          timeStamp: '15 min',
-          content: "<span class='text--primary'>cc: Daniel</span> &mdash; Tell me more..."
-        },
-        {
-          author: 'Brian',
-          timeStamp: '15 min',
-          content: "<span class='text--primary'>Nancy</span> &mdash; Do you see what time it is?"
-        }
-      ],
+      messages: [],
       letter_colors: [{
           letter: 'A',
           color: '#E52032'
@@ -212,15 +174,6 @@ export default {
       ]
     }
   },
-  // firebase: {
-  //   messages: {
-  //     source: db.ref('Messages'),
-  //     // Optional, allows you to handle any errors.
-  //     cancelCallback(err) {
-  //       console.error(err);
-  //     }
-  //   }
-  // },
   mounted: function() {
     const objDiv = document.getElementsByClassName("v-list");
     objDiv[0].scrollTop = objDiv[0].scrollHeight;
@@ -243,12 +196,12 @@ export default {
         }
       }
     },
-    getTime() {
-      let now = new Date();
-      let date = now.toISOString().substring(0, 10);
-      let hours = now.getHours();
-      let minutes = now.getMinutes();
-      let seconds = now.getSeconds();
+    getTime(firebase_ts) { 
+      let dateObj = new Date(firebase_ts.seconds * 1000) // date object
+      let date = dateObj.toISOString().substring(0, 10);
+      let hours = dateObj.getHours();
+      let minutes = dateObj.getMinutes();
+      let seconds = dateObj.getSeconds();
       let ampm = hours >= 12 ? 'PM' : 'AM';
       hours = hours % 12;
       hours = hours ? hours : 12; // the hour '0' should be '12'
@@ -261,13 +214,22 @@ export default {
     },
     addMessage: function (msg) {
       if (msg === '') return;
-      this.messages.push({
-        author: this.user,
-        timeStamp: this.getTime(),
-        content: msg
-      });
-    }
 
+      // Add message to firestore
+      db.collection('messages')
+        .add({
+          "author": this.user,
+          "content": msg,
+          "createTime": firebase.firestore.Timestamp.fromDate(new Date()),
+          "url": ''
+        })
+        .then(() => {
+          console.log("Message added.");
+        })
+        .catch(() => {
+          console.log('Something error happened.');
+        })
+    }
   }
 }
 </script>

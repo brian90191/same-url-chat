@@ -1,5 +1,5 @@
 import firebase from 'firebase/app'
-import 'firebase/database'
+import 'firebase/firestore'
 
 /* firebase */
 const firebaseConfig = {
@@ -7,7 +7,7 @@ const firebaseConfig = {
   authDomain: 'url-notepad.firebaseapp.com',
   databaseURL: 'https://url-notepad.firebaseio.com',
   projectId: 'url-notepad',
-  storageBucket: '',
+  storageBucket: 'url-notepad.appspot.com',
   messagingSenderId: '1077406778649',
   appId: '1:1077406778649:web:6ea1d7c80328d0fe'
 }
@@ -15,4 +15,4 @@ const firebaseConfig = {
 // Get a Firestore instance
 const firebaseApp = firebase.initializeApp(firebaseConfig)
 
-export const db = firebaseApp.database()
+export const db = firebaseApp.firestore()
