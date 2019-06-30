@@ -1,6 +1,6 @@
 <template>
   <div class="main_app">
-    <msgList :user="user" />
+    <msgList />
   </div>
 </template>
 
@@ -11,11 +11,6 @@ export default {
   name: 'app',
   components: {
     msgList
-  },
-  data () {
-    return {
-      user: 'Brian'
-    }
   }
 }
 </script>

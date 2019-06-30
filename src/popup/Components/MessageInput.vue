@@ -23,8 +23,8 @@ export default {
   },
   methods: {
     sendMessage: function () {
-      this.$emit('submit', this.message);
-      this.message = '';
+      this.$emit('submit', this.message)
+      this.message = ''
     }
   }
 }

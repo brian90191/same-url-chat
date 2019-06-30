@@ -10,5 +10,5 @@
     "permissions": [
         "tabs"
     ],
-    "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdn.firebase.com https://*.firebaseio.com; object-src 'self'"
+    "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdn.firebase.com https://*.firebaseio.com https://apis.google.com; object-src 'self'"
 }
